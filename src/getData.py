@@ -67,7 +67,7 @@ def get_classes() -> List:
             classes.append(cl)
     return classes
 
-def import_data(setType:str, split:bool=False, splitSize:int=None):
+def import_data(setType:str, split:bool=False, splitSize:int=None) -> tf.Tensor:
     """
     Import image from directory
     Parameter(s):
@@ -75,9 +75,10 @@ def import_data(setType:str, split:bool=False, splitSize:int=None):
         split (bool): Whether or not to split the dataset.
         splitSize (int): If split equals True, this is the percentage of split to create another set. 
     Returns:
-        dataset (set(set(tf.Tensor, tf.Tensor), tf.Tensor)|set(tf.Tensor,tf.Tensor): dataset itself with their labels
+        dataset (tuple(tf.Tensor(tf.Tensor,tf.Tensor), tf.Tensor(tf.Tensor,tf.Tensor))|tf.Tensor(tf.Tensor,tf.Tensor)): dataset itself with their labels
     """
     path = os.path.join(INPUTPATH, setType, '*', '*')
     setPath = tf.data.Dataset.list_files(path)
     dataset = setPath.map(get_image)
+    
     return dataset
