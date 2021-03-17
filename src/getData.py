@@ -67,20 +67,6 @@ def get_classes() -> List:
             classes.append(cl)
     return classes
 
-def get_labels(images_path:tf.string) -> List:
-    """
-    Get all labels of the images from the image path.
-    Parameter(s):
-        images_path (tf.string): Absolute path to images.
-    Returns:
-        labels (list): List of labels
-    """
-    labels = []
-    for lbl in images_path:
-        lbl = tf.strings.split(lbl, os.path.sep)
-        labels.append(lbl[-2])
-    return labels
-
 def import_data(setType:str, split:bool=False, splitSize:int=None):
     """
     Import image from directory
@@ -94,5 +80,4 @@ def import_data(setType:str, split:bool=False, splitSize:int=None):
     path = os.path.join(INPUTPATH, setType, '*', '*')
     setPath = tf.data.Dataset.list_files(path)
     dataset = setPath.map(get_image)
-    # labels = get_labels(setPath)
     return dataset
