@@ -1,14 +1,22 @@
 from tensorflow.keras.applications import VGG16
-from tensorflow.keras.applications.vgg16 import preprocess_input
 from tensorflow.keras.layers import Flatten, Dense, Dropout
 from tensorflow.keras.models import Model
 
 from typing import List
-# ICICbank
 
 from src.getData import IMG_WIDTH, IMG_HEIGHT
 
-def build_model(base_model:tf.keras.Model, dropout:float=.2, fc_layers:List[int]=[1024, 1024], num_classes:int=5, ):
+def build_model(base_model:tf.keras.Model=VGG16, dropout:float=.2, fc_layers:List[int]=[1024, 1024], num_classes:int=5) -> tf.keras.Model:
+    """
+    Build the model
+    parameter(s): 
+        base_model (tf.keras.Model): base model
+        dropout (float): dropout rate
+        fc_layers (list): list of units for dense layers
+        num_classes (int): number of output of the model
+    returns:
+        model (tf.keras.Model): model ready to train
+    """
     base_model = base_model(include_top=False, weights='imagenet', input_shape=(IMG_WIDTH, IMG_HEIGHT, 3))
 
     trainableLayers = len(base_model.layers) - int(len(base_model.layers) * .2)
