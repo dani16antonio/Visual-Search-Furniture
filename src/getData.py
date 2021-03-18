@@ -35,13 +35,11 @@ def decode_image(img:tf.Tensor, img_width:int, img_height:int)->tf.Tensor:
     img = tf.image.resize(img, [img_width, img_height])
     return img
 
-def get_image(image_path:str) -> Tuple:
+def get_image(image_path:tf.Tensor) -> Tuple:
     """
     Load image from the path 
     Parameter(s):
-        image_path (str): image path
-        img_width (int): width to rescale the image
-        img_height (int): height to rescale the image
+        image_path (tf.Tensor): image path
     retunrs:
         image (tf.Tensor, tf.Tensor): image itself with its label
     """
