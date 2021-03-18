@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 import tensorflow as tf
 import numpy as pn
@@ -67,7 +67,7 @@ def get_classes() -> List:
             classes.append(cl)
     return classes
 
-def import_data(setType:str, split:bool=False, splitSize:int=None) -> tf.Tensor:
+def import_data(setType:str, split:bool=False, splitSize:int=None) -> Union[tf.Tensor, Tuple]:
     """
     Import image from directory
     Parameter(s):
@@ -80,5 +80,5 @@ def import_data(setType:str, split:bool=False, splitSize:int=None) -> tf.Tensor:
     path = os.path.join(INPUTPATH, setType, '*', '*')
     setPath = tf.data.Dataset.list_files(path)
     dataset = setPath.map(get_image)
-    
+
     return dataset
