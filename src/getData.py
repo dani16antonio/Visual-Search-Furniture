@@ -2,11 +2,13 @@ from typing import List, Tuple, Union, DefaultDict
 from collections import defaultdict
 
 import tensorflow as tf
+from tensorflow.keras.preprocessing.image import ImageDataGenerator  
 import numpy as pn
 from PIL import Image
 import os
 
 INPUTPATH = os.path.join('..', 'input')
+IMG_WIDTH, IMG_HEIGHT = 224, 224
 
 def get_label(image_path:str)->str:
     """
@@ -33,7 +35,7 @@ def decode_image(img:tf.Tensor, img_width:int, img_height:int)->tf.Tensor:
     """
     img = tf.image.decode_jpeg(img, channels=3)
     img = tf.image.convert_image_dtype(img, tf.float32)
-    img = tf.image.resize(img, [img_width, img_height])
+    img = tf.image.resize(img, [IMG_WIDTH, IMG_HEIGHT])
     return img
 
 def get_image(image_path:tf.Tensor) -> Tuple:
@@ -44,9 +46,8 @@ def get_image(image_path:tf.Tensor) -> Tuple:
     retunrs:
         image (tf.Tensor, tf.Tensor): image itself with its label
     """
-    img_width,img_height = 224, 224
     image = tf.io.read_file(image_path)
-    img = decode_image(image, img_width, img_height)
+    img = decode_image(image, IMG_WIDTH, IMG_HEIGHT)
     label = get_label(image_path)
     return img, label
 
@@ -102,6 +103,10 @@ def get_splitted_path(setPath:tf.Tensor, countDict:DefaultDict) -> tf.Tensor:
     firstSet, SecondSet = tf.convert_to_tensor(firstSet, tf.string), tf.convert_to_tensor(SecondSet, tf.string)
     return firstSet, SecondSet
 
+def data_augmentation(path:tf.Tensor) -> tf.Tensor:
+    generator = ImageDataGenerator(rotation_range=90,horizontal_flip=True, rescale=1./255)
+    dataset = generator.flow_from_directory(path, class_mode='sparse')
+    return dataset
 
 def import_data(setType:str, split:bool=False, splitSize:float=.2) -> Union[tf.Tensor, Tuple[tf.Tensor, tf.Tensor]]:
     """
@@ -113,9 +118,10 @@ def import_data(setType:str, split:bool=False, splitSize:float=.2) -> Union[tf.T
     Returns:
         dataset (tuple(tf.Tensor(tf.Tensor,tf.Tensor), tf.Tensor(tf.Tensor,tf.Tensor))|tf.Tensor(tf.Tensor,tf.Tensor)): dataset itself with their labels
     """
-    path = os.path.join(INPUTPATH, setType, '*', '*')
-    setPath = tf.data.Dataset.list_files(path)
+    
     if split:
+        path = os.path.join(INPUTPATH, setType, '*', '*')
+        setPath = tf.data.Dataset.list_files(path)
         countDict = get_count_per_class(setPath)
         countDict.update((k, int(v*splitSize)) for k,v in countDict.items())
         firstSetPath, secondSetPath = get_splitted_path(setPath, countDict)
@@ -124,5 +130,7 @@ def import_data(setType:str, split:bool=False, splitSize:float=.2) -> Union[tf.T
         secondSetPath = tf.data.Dataset.from_tensor_slices(secondSetPath).map(get_image)
         return firstSetPath, secondSetPath
     else:
-        dataset = setPath.map(get_image)
-        return setPath
+        path = os.path.join(INPUTPATH, setType)
+        setPath = tf.data.Dataset.list_files(path)
+        dataset = data_augmentation(path)
+        return dataset
