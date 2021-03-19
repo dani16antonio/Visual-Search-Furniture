@@ -131,6 +131,6 @@ def import_data(setType:str, split:bool=False, splitSize:float=.2) -> Union[tf.T
         return firstSetPath, secondSetPath
     else:
         path = os.path.join(INPUTPATH, setType)
-        setPath = tf.data.Dataset.list_files(path)
+        # setPath = tf.data.Dataset.list_files(path)
         dataset = data_augmentation(path)
         return dataset

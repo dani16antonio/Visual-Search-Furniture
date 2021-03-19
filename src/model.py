@@ -1,10 +1,11 @@
+import tensorflow as tf
 from tensorflow.keras.applications import VGG16
 from tensorflow.keras.layers import Flatten, Dense, Dropout
 from tensorflow.keras.models import Model
 
 from typing import List
 
-from src.getData import IMG_WIDTH, IMG_HEIGHT
+from getData import IMG_WIDTH, IMG_HEIGHT
 
 def build_model(base_model:tf.keras.Model=VGG16, dropout:float=.2, fc_layers:List[int]=[1024, 1024], num_classes:int=5) -> tf.keras.Model:
     """
@@ -29,8 +30,8 @@ def build_model(base_model:tf.keras.Model=VGG16, dropout:float=.2, fc_layers:Lis
     x = base_model.output
     x = Flatten()(x)
     for i, fc in enumerate(fc_layers):
-        x = Dense(fc, activation='relu', name=f'dense_{i}') (x)
-        x = Dropout(dropout)
+        x = Dense(fc, activation='relu', name=f'dense_{i}')(x)
+        x = Dropout(dropout)(x)
     predictions = Dense(num_classes, activation="softmax")(x)
-    model = Model(inputs=base_model.output, outputs=predictions)
+    model = Model(inputs=base_model.input, outputs=predictions)
     return model
